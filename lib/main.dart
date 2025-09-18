@@ -94,6 +94,15 @@ class _SmileyScreenState extends State<SmileyScreen> {
                           ],
                         ),
                       ),
+                      DropdownMenuItem<String>(
+                        value: 'heart',
+                        child: Row(
+                          children: [
+                            SizedBox(width: 10),
+                            Text('Simple Heart'),
+                          ],
+                        ),
+                      ),
                     ],
                     onChanged: (String? newValue) {
                       setState(() {
@@ -132,7 +141,7 @@ class _SmileyScreenState extends State<SmileyScreen> {
                       ),
                     )
                   : CustomPaint(
-                      painter: SmileyFacePainter(),
+                      painter: SmileyFacePainter(selectedEmoji!),
                       size: Size.infinite,
                     ),
             ),
@@ -142,13 +151,25 @@ class _SmileyScreenState extends State<SmileyScreen> {
     );
   }
 }
-
 class SmileyFacePainter extends CustomPainter {
+  final String emojiType;
+  
+  SmileyFacePainter(this.emojiType);
+
   @override
   void paint(Canvas canvas, Size size) {
     final centerX = size.width / 2;
     final centerY = size.height / 2;
-    final faceRadius = min(size.width, size.height) * 0.2; // Responsive size
+    
+    if (emojiType == 'smiley') {
+      _drawSmileyFace(canvas, size, centerX, centerY);
+    } else if (emojiType == 'heart') {
+      _drawHeart(canvas, size, centerX, centerY);
+    }
+  }
+  
+  void _drawSmileyFace(Canvas canvas, Size size, double centerX, double centerY) {
+    final faceRadius = min(size.width, size.height) * 0.2;
     
     // Draw the face (simple yellow circle)
     final facePaint = Paint()
@@ -218,6 +239,37 @@ class SmileyFacePainter extends CustomPainter {
       false,
       smilePaint,
     );
+  }
+  
+  void _drawHeart(Canvas canvas, Size size, double centerX, double centerY) {
+    final heartSize = min(size.width, size.height) * 0.25;
+
+    final heartPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+
+    // Start at bottom point
+    path.moveTo(centerX, centerY + heartSize);
+
+    // Left curve
+    path.cubicTo(
+      centerX - heartSize * 1, centerY + heartSize * 0.5,
+      centerX - heartSize * 1, centerY - heartSize,
+      centerX, centerY - heartSize * 0.1,
+    );
+
+    // Right curve (mirror of left)
+    path.cubicTo(
+      centerX + heartSize * 1, centerY - heartSize,
+      centerX + heartSize * 1, centerY + heartSize * 0.5,
+      centerX, centerY + heartSize,
+    );
+
+    path.close();
+
+    canvas.drawPath(path, heartPaint);
   }
 
   @override
