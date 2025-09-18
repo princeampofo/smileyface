@@ -131,8 +131,9 @@ class _SmileyScreenState extends State<SmileyScreen> {
                         ),
                       ),
                     )
-                  : const Center(
-                      child: Text('Big Bright Smile'),
+                  : CustomPaint(
+                      painter: SmileyFacePainter(),
+                      size: Size.infinite,
                     ),
             ),
           ),
@@ -142,3 +143,85 @@ class _SmileyScreenState extends State<SmileyScreen> {
   }
 }
 
+class SmileyFacePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+    final faceRadius = min(size.width, size.height) * 0.2; // Responsive size
+    
+    // Draw the face (simple yellow circle)
+    final facePaint = Paint()
+      ..color = const Color(0xFFFDBF17)
+      ..style = PaintingStyle.fill;
+    
+    canvas.drawCircle(
+      Offset(centerX, centerY), 
+      faceRadius, 
+      facePaint,
+    );
+    
+    // Calculate eye positions and size
+    final eyeWidth = faceRadius * 0.25;
+    final eyeHeight = faceRadius * 0.45;
+    final eyeOffsetX = faceRadius * 0.35;
+    final eyeOffsetY = faceRadius * 0.25;
+    
+    // Fill the left eye (black oval)
+    final leftEyePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+    
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(centerX - eyeOffsetX, centerY - eyeOffsetY),
+        width: eyeWidth,
+        height: eyeHeight,
+      ),
+      leftEyePaint,
+    );
+    
+    // Fill the right eye (black oval)
+    final rightEyePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+    
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(centerX + eyeOffsetX, centerY - eyeOffsetY),
+        width: eyeWidth,
+        height: eyeHeight,
+      ),
+      rightEyePaint,
+    );
+    
+    // Draw the smile (black arc)
+    final smileRadius = faceRadius * 0.60;
+    final smileOffsetY = faceRadius * 0.10;
+    
+    final smilePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = faceRadius * 0.06
+      ..strokeCap = StrokeCap.round;
+    
+    final smileRect = Rect.fromCenter(
+      center: Offset(centerX, centerY + smileOffsetY),
+      width: smileRadius * 2,
+      height: smileRadius * 2,
+    );
+    
+    canvas.drawArc(
+      smileRect,
+      0.3, // Start angle
+      2.5, // Sweep angle
+      false,
+      smilePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
